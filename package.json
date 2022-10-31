@@ -4,7 +4,7 @@
   "description": "project api",
   "scripts": {
     "start": "node ./dist/main.js",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Aleksandr Avdeev",

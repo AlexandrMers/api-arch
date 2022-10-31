@@ -4,14 +4,18 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "module": "CommonJS",
-    "moduleResolution": "Node",
+    "moduleResolution": "Node16",
     "outDir": "./dist",
     "removeComments": true,
+    "sourceMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "strictPropertyInitialization": false,
+    "baseUrl": "src"
   },
-  "include": ["./src"],
+  "include": [
+    "src/",
+  ],
   "exclude": ["node_modules"]
 }
