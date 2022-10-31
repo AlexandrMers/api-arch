@@ -1,8 +1,9 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import { BaseController } from "../common/base.controller";
 
 import { LoggerService } from "../logger/logger.service";
+import { HTTPError } from "errors/http-error.class";
 
 export class UserController extends BaseController {
   constructor(logger: LoggerService) {

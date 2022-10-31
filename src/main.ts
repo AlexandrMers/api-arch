@@ -1,9 +1,13 @@
 import { App } from "./app";
 
-import { LoggerService } from "./logger/logger.service";
+import { LoggerService } from "logger/logger.service";
+import { ExceptionFilter } from "errors/exception.filter";
 
 async function bootstrap() {
-  const app = new App(new LoggerService());
+  const logger = new LoggerService();
+  const exceptionFilter = new ExceptionFilter(logger);
+
+  const app = new App(logger, exceptionFilter);
   await app.init();
 }
 
