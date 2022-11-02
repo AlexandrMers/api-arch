@@ -1,15 +1,19 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
-import { BaseController } from "../common/base.controller";
+import { BaseController } from "common/base.controller";
 
 import { LoggerService } from "../logger/logger.service";
-import { HTTPError } from "errors/http-error.class";
+import { inject, injectable } from "inversify";
 
+import { TYPES } from "../bindingTypes";
+
+import "reflect-metadata";
+
+@injectable()
 export class UserController extends BaseController {
-  constructor(logger: LoggerService) {
-    super(logger);
-
-    logger.log(`Binding UserController:`);
+  constructor(@inject(TYPES.LOGGER) loggerService: LoggerService) {
+    super(loggerService);
+    loggerService.log(`Binding UserController:`);
 
     this.bindRoutes([
       {
