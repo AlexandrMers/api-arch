@@ -1,12 +1,13 @@
 import express, { Express } from "express";
 import { Server } from "http";
+import { inject, injectable } from "inversify";
 
 import { ExceptionFilter } from "errors/exception.filter";
 
 import { LoggerService } from "logger/logger.service";
 
 import { UserController } from "users/users.controller";
-import { inject, injectable } from "inversify";
+
 import { TYPES } from "./bindingTypes";
 
 import "reflect-metadata";
