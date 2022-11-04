@@ -1,5 +1,8 @@
 import { Container, ContainerModule } from "inversify";
 
+// For using DI
+import "reflect-metadata";
+
 // Application
 import { App } from "./app";
 
@@ -8,6 +11,7 @@ import { UserController } from "users/users.controller";
 
 // Services
 import { LoggerService } from "logger/logger.service";
+import { UsersService } from "./users/users.service";
 
 // Utils
 import { ExceptionFilter } from "errors/exception.filter";
@@ -19,14 +23,13 @@ import { TYPES } from "./bindingTypes";
 import { ExceptionFilterInterface } from "errors/exception.filter.interface";
 import { LoggerInterface } from "./logger/logger.interface";
 import { UsersControllerInterface } from "./users/users.controller.interface";
-
-// For using DI
-import "reflect-metadata";
+import { UsersServiceInterface } from "./users/users.service.interface";
 
 const appBindings = new ContainerModule((bind) => {
   bind<LoggerInterface>(TYPES.LOGGER).to(LoggerService);
   bind<ExceptionFilterInterface>(TYPES.EXCEPTION_FILTER).to(ExceptionFilter);
   bind<UsersControllerInterface>(TYPES.USER_CONTROLLER).to(UserController);
+  bind<UsersServiceInterface>(TYPES.USER_SERVICE).to(UsersService);
   bind<App>(TYPES.APP).to(App);
 });
 

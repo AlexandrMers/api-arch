@@ -1,28 +1,35 @@
-import { Request, Response } from "express";
+import { inject, injectable } from "inversify";
 import "reflect-metadata";
+import { NextFunction, Request, Response } from "express";
 
+import { HTTPError } from "errors/http-error.class";
+
+// Types
+import { TYPES } from "bindingTypes";
+import { UsersControllerInterface } from "./users.controller.interface";
+
+// Controllers
 import { BaseController } from "common/base.controller";
 
+// Services
 import { LoggerService } from "../logger/logger.service";
-import { inject, injectable } from "inversify";
-
-import { TYPES } from "bindingTypes";
-
-import { UsersControllerInterface } from "./users.controller.interface";
+import { UsersService } from "./users.service";
 
 // DTO
 import { UserLoginDto } from "./dto/user-login.dto";
 import { UserRegisterDto } from "./dto/user-register.dto";
-import { User } from "./user.entity";
 
 @injectable()
 export class UserController
   extends BaseController
   implements UsersControllerInterface
 {
-  constructor(@inject(TYPES.LOGGER) loggerService: LoggerService) {
+  constructor(
+    @inject(TYPES.LOGGER) private loggerService: LoggerService,
+    @inject(TYPES.USER_SERVICE) private usersService: UsersService
+  ) {
     super(loggerService);
-    loggerService.log(`Binding UserController:`);
+    this.loggerService.log(`Binding UserController:`);
 
     this.bindRoutes([
       {
@@ -42,9 +49,18 @@ export class UserController
     this.ok(res, "Login!");
   }
 
-  async register({ body }: Request<{}, {}, UserRegisterDto>, res: Response) {
-    const newUser = new User(body.email, body.login);
-    await newUser.setPassword(body.password);
+  async register(
+    { body }: Request<{}, {}, UserRegisterDto>,
+    res: Response,
+    next: NextFunction
+  ) {
+    const newUser = await this.usersService.createUser(body);
+
+    if (!newUser) {
+      return next(
+        new HTTPError(422, "Пользователь с таким логином уже существует!")
+      );
+    }
 
     this.ok(res, newUser);
   }
