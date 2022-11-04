@@ -7,6 +7,7 @@ import { HTTPError } from "errors/http-error.class";
 // Types
 import { TYPES } from "bindingTypes";
 import { UsersControllerInterface } from "./users.controller.interface";
+import { ValidateMiddleware } from "common/validate.middleware";
 
 // Controllers
 import { BaseController } from "common/base.controller";
@@ -26,10 +27,17 @@ export class UserController
 {
   constructor(
     @inject(TYPES.LOGGER) private loggerService: LoggerService,
-    @inject(TYPES.USER_SERVICE) private usersService: UsersService
+    @inject(TYPES.USER_SERVICE) private usersService: UsersService,
+    @inject(TYPES.VALIDATOR_MIDDLEWARE)
+    ValidatorMiddleware: typeof ValidateMiddleware
   ) {
     super(loggerService);
     this.loggerService.log(`Binding UserController:`);
+
+    const userRegisterValidator = new ValidatorMiddleware(
+      UserRegisterDto,
+      loggerService
+    );
 
     this.bindRoutes([
       {
@@ -42,14 +50,7 @@ export class UserController
         path: "/register",
         method: "post",
         func: this.register,
-        middlewares: [
-          {
-            execute: (req, res, next) => {
-              console.log("middleware in register method");
-              next();
-            },
-          },
-        ],
+        middlewares: [userRegisterValidator],
       },
     ]);
   }
@@ -67,7 +68,11 @@ export class UserController
 
     if (!newUser) {
       return next(
-        new HTTPError(422, "Пользователь с таким логином уже существует!")
+        new HTTPError(
+          422,
+          "Пользователь с таким логином уже существует!",
+          this.constructor.name
+        )
       );
     }
 
