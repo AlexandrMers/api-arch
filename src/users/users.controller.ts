@@ -68,14 +68,8 @@ export class UserController
 
     if (!newUser) {
       return next(
-        new HTTPError(
-          422,
-          "Пользователь с таким логином уже существует!",
-          this.constructor.name
-        )
+        new HTTPError(422, "Пользователь с таким логином уже существует!", this)
       );
     }
-
-    this.ok(res, newUser);
   }
 }
