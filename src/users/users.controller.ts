@@ -36,11 +36,20 @@ export class UserController
         path: "/login",
         method: "post",
         func: this.login,
+        middlewares: [],
       },
       {
         path: "/register",
         method: "post",
         func: this.register,
+        middlewares: [
+          {
+            execute: (req, res, next) => {
+              console.log("middleware in register method");
+              next();
+            },
+          },
+        ],
       },
     ]);
   }
