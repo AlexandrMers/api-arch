@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import "reflect-metadata";
 
 import { BaseController } from "common/base.controller";
 
@@ -9,7 +10,9 @@ import { TYPES } from "bindingTypes";
 
 import { UsersControllerInterface } from "./users.controller.interface";
 
-import "reflect-metadata";
+// DTO
+import { UserLoginDto } from "./dto/user-login.dto";
+import { UserRegisterDto } from "./dto/user-register.dto";
 
 @injectable()
 export class UserController
@@ -34,11 +37,11 @@ export class UserController
     ]);
   }
 
-  login(req: Request, res: Response) {
+  login(req: Request<{}, {}, UserLoginDto>, res: Response) {
     this.ok(res, "Login!");
   }
 
-  register(req: Request, res: Response) {
+  register(req: Request<{}, {}, UserRegisterDto>, res: Response) {
     this.ok(res, "Register!");
   }
 }

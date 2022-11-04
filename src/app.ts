@@ -39,11 +39,16 @@ export class App {
     this.app.use(this.exceptionFilter.catch.bind(this));
   }
 
+  useMiddlewares() {
+    this.app.use(express.json());
+  }
+
   useRoutes() {
     this.app.use("/users", this.userController.router);
   }
 
   public async init() {
+    this.useMiddlewares();
     this.useRoutes();
     this.useExceptionFilters();
   }
