@@ -1,5 +1,6 @@
-import { Container } from "inversify";
+import { Container, ContainerModule } from "inversify";
 
+// Application
 import { App } from "./app";
 
 // Controllers
@@ -11,22 +12,31 @@ import { LoggerService } from "logger/logger.service";
 // Utils
 import { ExceptionFilter } from "errors/exception.filter";
 
-// Types
+// Binding Types
 import { TYPES } from "./bindingTypes";
-import { ExceptionFilterInterface } from "./errors/exception.filter.interface";
 
+// Types
+import { ExceptionFilterInterface } from "errors/exception.filter.interface";
+import { LoggerInterface } from "./logger/logger.interface";
+import { UsersControllerInterface } from "./users/users.controller.interface";
+
+// For using DI
 import "reflect-metadata";
 
-const appContainer = new Container();
+const appBindings = new ContainerModule((bind) => {
+  bind<LoggerInterface>(TYPES.LOGGER).to(LoggerService);
+  bind<ExceptionFilterInterface>(TYPES.EXCEPTION_FILTER).to(ExceptionFilter);
+  bind<UsersControllerInterface>(TYPES.USER_CONTROLLER).to(UserController);
+  bind<App>(TYPES.APP).to(App);
+});
 
-appContainer.bind<App>(TYPES.APP).to(App);
-appContainer.bind<LoggerService>(TYPES.LOGGER).to(LoggerService);
-appContainer
-  .bind<ExceptionFilterInterface>(TYPES.EXCEPTION_FILTER)
-  .to(ExceptionFilter);
-appContainer.bind<UserController>(TYPES.USER_CONTROLLER).to(UserController);
-const app = appContainer.get<App>(TYPES.APP);
+function bootstrap() {
+  const appContainer = new Container();
+  appContainer.load(appBindings);
 
-app.init();
+  const app = appContainer.get<App>(TYPES.APP);
+  app.init();
+  return { appContainer, app };
+}
 
-export { app, appContainer };
+export const { app, appContainer } = bootstrap();
