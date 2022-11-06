@@ -6,4 +6,5 @@ export const TYPES = {
   USER_SERVICE: Symbol.for("User_Service"),
   VALIDATOR_MIDDLEWARE: Symbol.for("Validator_Middleware"),
   CONFIG_SERVICE: Symbol.for("Config_Service"),
+  PRISMA_SERVICE: Symbol.for("Prisma_Service"),
 };

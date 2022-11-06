@@ -15,6 +15,7 @@ import { UserController } from "users/users.controller";
 // Services
 import { LoggerService } from "logger/logger.service";
 import { ExceptionFilter } from "errors/exception.filter";
+import { PrismaService } from "./common/prisma.service";
 
 @injectable()
 export class App {
@@ -26,7 +27,8 @@ export class App {
     @inject(TYPES.LOGGER) private logger: LoggerService,
     @inject(TYPES.EXCEPTION_FILTER) private exceptionFilter: ExceptionFilter,
     @inject(TYPES.USER_CONTROLLER) private userController: UserController,
-    @inject(TYPES.CONFIG_SERVICE) private configService: ConfigServiceInterface
+    @inject(TYPES.CONFIG_SERVICE) private configService: ConfigServiceInterface,
+    @inject(TYPES.PRISMA_SERVICE) private prismaService: PrismaService
   ) {
     this.app = express();
     this.port = Number(this.configService.get("PORT"));
@@ -52,9 +54,15 @@ export class App {
     this.app.use("/users", this.userController.router);
   }
 
+  async connectToDb() {
+    await this.prismaService.connect();
+  }
+
   public async init() {
     this.useMiddlewares();
     this.useRoutes();
     this.useExceptionFilters();
+
+    await this.connectToDb();
   }
 }

@@ -23,12 +23,14 @@ import { UserController } from "users/users.controller";
 import { LoggerService } from "logger/logger.service";
 import { UsersService } from "./users/users.service";
 import { ConfigService } from "./config/config.service";
+import { PrismaService } from "./common/prisma.service";
 
 // Middlewares
 import { ValidateMiddleware } from "./common/validate.middleware";
 
 // Utils
 import { ExceptionFilter } from "errors/exception.filter";
+import { PrismaServiceInterface } from "./common/prisma.service.interface";
 
 const appBindings = new ContainerModule((bind) => {
   bind<LoggerInterface>(TYPES.LOGGER).to(LoggerService).inSingletonScope();
@@ -41,6 +43,11 @@ const appBindings = new ContainerModule((bind) => {
   bind<ConfigServiceInterface>(TYPES.CONFIG_SERVICE)
     .to(ConfigService)
     .inSingletonScope();
+
+  bind<PrismaServiceInterface>(TYPES.PRISMA_SERVICE)
+    .to(PrismaService)
+    .inSingletonScope();
+
   bind<App>(TYPES.APP).to(App);
 });
 
