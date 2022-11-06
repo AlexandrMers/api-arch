@@ -19,6 +19,7 @@ import { UsersService } from "./users.service";
 // DTO
 import { UserLoginDto } from "./dto/user-login.dto";
 import { UserRegisterDto } from "./dto/user-register.dto";
+import { UserModel } from "@prisma/client";
 
 @injectable()
 export class UserController
@@ -71,5 +72,10 @@ export class UserController
         new HTTPError(422, "Пользователь с таким логином уже существует!", this)
       );
     }
+
+    this.ok<{ email: UserModel["email"]; id: UserModel["id"] }>(res, {
+      id: newUser.id,
+      email: newUser.email,
+    });
   }
 }

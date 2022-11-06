@@ -5,7 +5,7 @@ export class UserRegisterDto {
   email: string;
 
   @IsString({ message: "Обязательное поле" })
-  login: string;
+  name: string;
 
   @IsString({ message: "Обязательное поле" })
   password: string;
