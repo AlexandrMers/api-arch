@@ -1,13 +1,13 @@
-// For DI
-import { injectable } from "inversify";
-import "reflect-metadata";
-
 import { NextFunction, Request, Response } from "express";
 import { validate } from "class-validator";
 import { ClassConstructor, plainToClass } from "class-transformer";
 
+// For DI
+import { injectable } from "inversify";
+import "reflect-metadata";
+
+import { LoggerInterface } from "logger/logger.interface";
 import { MiddlewareInterface } from "./middleware.interface";
-import { LoggerInterface } from "../logger/logger.interface";
 
 @injectable()
 export class ValidateMiddleware implements MiddlewareInterface {

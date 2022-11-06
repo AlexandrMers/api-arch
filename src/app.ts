@@ -1,16 +1,20 @@
 import express, { Express } from "express";
 import { Server } from "http";
+
+// Types
+import { TYPES } from "./bindingTypes";
+import { ConfigServiceInterface } from "config/config.service.interface";
+
+// For DI
 import { inject, injectable } from "inversify";
+import "reflect-metadata";
 
-import { ExceptionFilter } from "errors/exception.filter";
-
-import { LoggerService } from "logger/logger.service";
-
+// Controllers
 import { UserController } from "users/users.controller";
 
-import { TYPES } from "./bindingTypes";
-
-import "reflect-metadata";
+// Services
+import { LoggerService } from "logger/logger.service";
+import { ExceptionFilter } from "errors/exception.filter";
 
 @injectable()
 export class App {
@@ -21,10 +25,11 @@ export class App {
   constructor(
     @inject(TYPES.LOGGER) private logger: LoggerService,
     @inject(TYPES.EXCEPTION_FILTER) private exceptionFilter: ExceptionFilter,
-    @inject(TYPES.USER_CONTROLLER) private userController: UserController
+    @inject(TYPES.USER_CONTROLLER) private userController: UserController,
+    @inject(TYPES.CONFIG_SERVICE) private configService: ConfigServiceInterface
   ) {
     this.app = express();
-    this.port = 8000;
+    this.port = Number(this.configService.get("PORT"));
 
     this.server = this.app.listen(this.port, () => {
       this.runServerLog();
