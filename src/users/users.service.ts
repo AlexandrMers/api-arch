@@ -1,6 +1,9 @@
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
 
+// Models
+import { UserModel } from "@prisma/client";
+
 // Types
 import { TYPES } from "bindingTypes";
 import { UsersServiceInterface } from "./users.service.interface";
@@ -12,9 +15,6 @@ import { User } from "./user.entity";
 
 // Services
 import { ConfigService } from "config/config.service";
-
-// Models
-import { UserModel } from "@prisma/client";
 
 // DTO
 import { UserRegisterDto } from "./dto/user-register.dto";
