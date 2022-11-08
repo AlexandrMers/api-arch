@@ -12,10 +12,13 @@ import { User } from "./user.entity";
 // Services
 import { ConfigService } from "config/config.service";
 
+// Models
+import { UserModel } from "@prisma/client";
+
 // DTO
 import { UserRegisterDto } from "./dto/user-register.dto";
 import { UsersRepositoryInterface } from "./users.repository.interface";
-import { UserModel } from "@prisma/client";
+import { UserLoginDto } from "./dto/user-login.dto";
 
 @injectable()
 export class UsersService implements UsersServiceInterface {
@@ -42,7 +45,19 @@ export class UsersService implements UsersServiceInterface {
     return this.usersRepository.create(newUser);
   }
 
-  async validateUser(login: string): Promise<Boolean> {
-    return true;
+  async validateUser({ email, password }: UserLoginDto): Promise<Boolean> {
+    const existedUser = await this.usersRepository.find(email);
+
+    if (!existedUser) {
+      return false;
+    }
+
+    const user = new User(
+      existedUser.email,
+      existedUser.name,
+      existedUser.password
+    );
+
+    return user.comparePassword(password);
   }
 }

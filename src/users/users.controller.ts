@@ -40,12 +40,17 @@ export class UserController
       loggerService
     );
 
+    const userLoginValidator = new ValidatorMiddleware(
+      UserLoginDto,
+      loggerService
+    );
+
     this.bindRoutes([
       {
         path: "/login",
         method: "post",
         func: this.login,
-        middlewares: [],
+        middlewares: [userLoginValidator],
       },
       {
         path: "/register",
@@ -54,10 +59,6 @@ export class UserController
         middlewares: [userRegisterValidator],
       },
     ]);
-  }
-
-  login(req: Request<{}, {}, UserLoginDto>, res: Response) {
-    this.ok(res, "Login!");
   }
 
   async register(
@@ -76,6 +77,22 @@ export class UserController
     this.ok<{ email: UserModel["email"]; id: UserModel["id"] }>(res, {
       id: newUser.id,
       email: newUser.email,
+    });
+  }
+
+  async login(
+    { body }: Request<{}, {}, UserLoginDto>,
+    res: Response,
+    next: NextFunction
+  ) {
+    const isExistUser = await this.usersService.validateUser(body);
+
+    if (!isExistUser) {
+      return next(new HTTPError(422, "Неверные логин или пароль!"));
+    }
+
+    this.ok(res, {
+      email: body.email,
     });
   }
 }
