@@ -5,6 +5,7 @@ import "reflect-metadata";
 import { TYPES } from "bindingTypes";
 import { UsersServiceInterface } from "./users.service.interface";
 import { LoggerInterface } from "logger/logger.interface";
+import { UsersRepositoryInterface } from "./users.repository.interface";
 
 // Entities
 import { User } from "./user.entity";
@@ -17,7 +18,6 @@ import { UserModel } from "@prisma/client";
 
 // DTO
 import { UserRegisterDto } from "./dto/user-register.dto";
-import { UsersRepositoryInterface } from "./users.repository.interface";
 import { UserLoginDto } from "./dto/user-login.dto";
 
 @injectable()
