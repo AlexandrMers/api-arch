@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import { verify } from "jsonwebtoken";
 
 import { MiddlewareInterface } from "./middleware.interface";
-import { JwtPayload, verify } from "jsonwebtoken";
 
 function extractTokenFromHeaders(bearerToken: string) {
   return bearerToken.split(" ")[1];
