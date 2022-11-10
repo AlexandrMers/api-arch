@@ -16,6 +16,7 @@ import { UserController } from "users/users.controller";
 import { LoggerService } from "logger/logger.service";
 import { ExceptionFilter } from "errors/exception.filter";
 import { PrismaService } from "./common/prisma.service";
+import { AuthMiddleware } from "./common/auth.middleware";
 
 @injectable()
 export class App {
@@ -48,6 +49,11 @@ export class App {
 
   useMiddlewares() {
     this.app.use(express.json());
+
+    const secretKey = this.configService.get("SECRET_JWT");
+
+    const authMiddleware = new AuthMiddleware(secretKey);
+    this.app.use(authMiddleware.execute.bind(authMiddleware));
   }
 
   useRoutes() {

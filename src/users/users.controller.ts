@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
 import { NextFunction, Request, Response } from "express";
+import { sign } from "jsonwebtoken";
 
 import { HTTPError } from "errors/http-error.class";
 
@@ -8,6 +9,7 @@ import { HTTPError } from "errors/http-error.class";
 import { TYPES } from "bindingTypes";
 import { UsersControllerInterface } from "./users.controller.interface";
 import { ValidateMiddleware } from "common/validate.middleware";
+import { ConfigServiceInterface } from "../config/config.service.interface";
 
 // Controllers
 import { BaseController } from "common/base.controller";
@@ -19,7 +21,30 @@ import { UsersService } from "./users.service";
 // DTO
 import { UserLoginDto } from "./dto/user-login.dto";
 import { UserRegisterDto } from "./dto/user-register.dto";
+
+// Models
 import { UserModel } from "@prisma/client";
+
+function signJwtPromisify(email: string, secret: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    sign(
+      {
+        email,
+        iat: Math.floor(Date.now() / 1000),
+      },
+      secret,
+      {
+        algorithm: "HS256",
+      },
+      (error, encoded) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(encoded as string);
+      }
+    );
+  });
+}
 
 @injectable()
 export class UserController
@@ -30,7 +55,8 @@ export class UserController
     @inject(TYPES.LOGGER) private loggerService: LoggerService,
     @inject(TYPES.USER_SERVICE) private usersService: UsersService,
     @inject(TYPES.VALIDATOR_MIDDLEWARE)
-    ValidatorMiddleware: typeof ValidateMiddleware
+    ValidatorMiddleware: typeof ValidateMiddleware,
+    @inject(TYPES.CONFIG_SERVICE) private configService: ConfigServiceInterface
   ) {
     super(loggerService);
     this.loggerService.log(`Binding UserController:`);
@@ -57,6 +83,12 @@ export class UserController
         method: "post",
         func: this.register,
         middlewares: [userRegisterValidator],
+      },
+      {
+        path: "/info",
+        method: "get",
+        func: this.info,
+        middlewares: [],
       },
     ]);
   }
@@ -91,8 +123,27 @@ export class UserController
       return next(new HTTPError(422, "Неверные логин или пароль!"));
     }
 
+    const secretKey = this.configService.get("SECRET_JWT");
+    const jwt = await this.signJWT(body.email, secretKey);
+
     this.ok(res, {
-      email: body.email,
+      jwt,
     });
+  }
+
+  async info(
+    req: Request<{}, {}, UserLoginDto>,
+    res: Response,
+    next: NextFunction
+  ) {
+    if (!req.user) {
+      console.log("req.user ->", req.user);
+      return next(new HTTPError(422, "Пользователь не авторизован", this));
+    }
+    this.ok(res, { email: req.user });
+  }
+
+  async signJWT(email: string, secret: string) {
+    return signJwtPromisify(email, secret);
   }
 }
