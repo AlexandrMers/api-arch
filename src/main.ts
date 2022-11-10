@@ -59,13 +59,13 @@ const appBindings = new ContainerModule((bind) => {
   bind<App>(TYPES.APP).to(App);
 });
 
-function bootstrap() {
+async function bootstrap() {
   const appContainer = new Container();
   appContainer.load(appBindings);
 
   const app = appContainer.get<App>(TYPES.APP);
-  app.init();
+  await app.init();
   return { appContainer, app };
 }
 
-export const { app, appContainer } = bootstrap();
+export const boot = bootstrap();

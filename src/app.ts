@@ -71,4 +71,8 @@ export class App {
 
     await this.connectToDb();
   }
+
+  public close() {
+    this.server.close();
+  }
 }
