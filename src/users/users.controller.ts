@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 
 import { HTTPError } from "errors/http-error.class";
+import { AuthGuard } from "common/auth.guard";
 
 // Types
 import { TYPES } from "bindingTypes";
@@ -87,8 +88,8 @@ export class UserController
       {
         path: "/info",
         method: "get",
-        func: this.info,
-        middlewares: [],
+        func: this.userInfo,
+        middlewares: [new AuthGuard()],
       },
     ]);
   }
@@ -124,23 +125,21 @@ export class UserController
     }
 
     const secretKey = this.configService.get("SECRET_JWT");
-    const jwt = await this.signJWT(body.email, secretKey);
+    const token = await this.signJWT(body.email, secretKey);
 
     this.ok(res, {
-      jwt,
+      token,
     });
   }
 
-  async info(
-    req: Request<{}, {}, UserLoginDto>,
-    res: Response,
-    next: NextFunction
-  ) {
-    if (!req.user) {
-      console.log("req.user ->", req.user);
-      return next(new HTTPError(422, "Пользователь не авторизован", this));
-    }
-    this.ok(res, { email: req.user });
+  async userInfo(req: Request<{}, {}, UserLoginDto>, res: Response) {
+    const userInfo = await this.usersService.getUserInfo(req.user);
+
+    this.ok(res, {
+      email: userInfo?.email,
+      id: userInfo?.id,
+      name: userInfo?.name,
+    });
   }
 
   async signJWT(email: string, secret: string) {

@@ -60,4 +60,8 @@ export class UsersService implements UsersServiceInterface {
 
     return user.comparePassword(password);
   }
+
+  async getUserInfo(email: string) {
+    return this.usersRepository.find(email);
+  }
 }
